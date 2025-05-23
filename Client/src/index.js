@@ -1,13 +1,13 @@
 import { createRoot } from "react-dom/client";
 import App from "./App";
-import ApiContext from "./Context/apiContext";
-import CallContext from "./Context/callContext";
+import { ApiProvider } from "./Context/apiContext";
+import { CallProvider } from "./Context/callContext";
 
 const root = createRoot(document.getElementById('root'))
 root.render(
-    <ApiContext>
-        <CallContext>
+    <ApiProvider>
+        <CallProvider>
             <App />
-        </CallContext>
-    </ApiContext>
+        </CallProvider>
+    </ApiProvider>
 )
