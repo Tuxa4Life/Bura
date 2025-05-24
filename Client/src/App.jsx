@@ -1,10 +1,16 @@
-import { useEffect, useState } from "react";
-import { useApiContext } from './Hooks/useContexts.js'
+import { Route, Routes } from "react-router-dom";
+import Home from "./Pages/Home";
+import Lobby from "./Pages/Lobby";
+import Game from "./Pages/Game";
 
 const App = () => {
-    return <div>
-        <h1>Hello World!</h1>
-    </div>
+    return <>
+        <Routes>
+            <Route path="/" element={<Home />}/>
+            <Route path="/lobby" element={<Lobby />} />
+            <Route path="/game/:id" element={<Game />} />z
+        </Routes>
+    </>
 }
 
 export default App;

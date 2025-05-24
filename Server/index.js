@@ -17,4 +17,18 @@ server.listen(3001, () => {
 
 io.on('connection', socket => {
     console.log('instance connected: ', socket.id)
+
+    socket.on('disconnect', () => {
+        socket.broadcast.emit('delete-on-disconnect', { id: socket.id })
+        console.log('disconnected: ', socket.id)
+    })
+
+    socket.on('entered-lobby', () => {
+        socket.emit('create-user', { id: socket.id })
+    })
+
+    socket.on('room-created', () => {
+        socket.emit('refresh-rooms')
+        socket.broadcast.emit('refresh-rooms')
+    })
 })

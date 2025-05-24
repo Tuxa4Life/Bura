@@ -1,9 +1,11 @@
-import { createContext } from "react";
+import { createContext, useState } from "react";
 import { db } from "../firebase.js";
-import { addDoc, collection, getDocs, getDoc } from "firebase/firestore";
+import { collection, getDocs, getDoc, doc, setDoc, deleteDoc } from "firebase/firestore";
 
 const ApiContext = createContext()
 const ApiProvider = ({ children }) => {
+    const [user, setUser] = useState({ username: 'Guest', id: '' })
+    const [rooms, setRooms] = useState([])
 
     const fetchCol = async (col) => {
         const output = []
@@ -21,16 +23,30 @@ const ApiProvider = ({ children }) => {
         if (docSnap.exists()) return docSnap.data()
     }
 
-    const postCol = async (col, obj) => {
+    const postItem = async (col, id, obj) => {
         try {
-            const response = await addDoc(collection(db, col), obj)
-            return response.id
+            const docRef = doc(db, col, id)
+            await setDoc(docRef, obj)
+            return id
         } catch (e) {
             console.error("Error adding document:", e)
         }
     }
 
-    const data = { fetchCol, postCol, getItem }
+    const deleteItem = async (col, id) => {
+        try {
+            await deleteDoc(doc(db, col, id));
+        } catch (e) {
+            console.error("Error deleting document:", e);
+        }
+    }
+
+    const getRooms = async () => {
+        const response = await fetchCol('rooms')
+        setRooms([...response])
+    }
+
+    const data = { user, rooms, setUser, postItem, deleteItem, getRooms, getItem }
     return <ApiContext.Provider value={data}>
         {children}
     </ApiContext.Provider>
