@@ -204,6 +204,7 @@ const Game = () => {
         {
             (players.length !== 4) &&
             <div style={{ width: '100%', height: '100dvh', position: 'fixed', top: '0', left: '0', zIndex: '1', backgroundColor: 'white' }}>
+                <h1>ROOM ID: {id}</h1>
                 <h1>Waiting for players... ({players.length}/4)</h1>
                 <h3 style={{ margin: '0' }}>PLAYERS:</h3>
                 <ol>

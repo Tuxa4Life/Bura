@@ -29,6 +29,7 @@ server.listen(PORT, () => {
 io.on("connection", (socket) => {
     //! Joining - leaving rooms
     socket.on("joinRoom", async ({ name, roomId }) => {
+        console.log(`${name} joined room: ${roomId}`)
         socket.data.username = name;
         socket.data.roomId = roomId;
         socket.join(roomId);
@@ -59,10 +60,6 @@ io.on("connection", (socket) => {
         io.to(roomId).emit("getPlayers", game.players);
     });
 
-    socket.on("disconnect", () => {
-        console.log(`DISCONNECTED: ${socket.id}`);
-    });
-
     //! GAME STUFF
     socket.on("start-game", async (roomId) => {
         const game = games[roomId];
@@ -79,6 +76,7 @@ io.on("connection", (socket) => {
         let allPlayed = true;
         game.players.map((player) => {
             allPlayed = allPlayed && player.played.length !== 0;
+            console.log(`${player.name}: ${player.hand}`)
         });
 
         if (!allPlayed) {
