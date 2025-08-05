@@ -173,12 +173,12 @@ io.on("connection", (socket) => {
 const startGame = (game, roomId) => {
     const initialDeck = shuffle(cards);
 
-    game.deck = [...initialDeck];
-    game.trump = initialDeck[initialDeck.length - 1];
-    game.multiplier = 1;
+    game?.deck = [...initialDeck];
+    game?.trump = initialDeck[initialDeck.length - 1];
+    game?.multiplier = 1;
 
-    game.players.forEach((player) => {
-        player.hand = dealCards(game.deck, 5);
+    game?.players.forEach((player) => {
+        player.hand = dealCards(game?.deck, 5);
         player.taken = [];
     });
 
