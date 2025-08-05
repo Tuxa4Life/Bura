@@ -1,0 +1,310 @@
+* {
+    transition: 0.2s all;
+    margin: 0;
+    padding: 0;
+    font-family: "Ubuntu", sans-serif;
+}
+
+.board {
+    width: 100%;
+    height: 100dvh;
+    background-color: #00753c;
+    position: relative;
+    overflow: hidden;
+
+}
+
+.card {
+    width: 100px;
+    border-radius: 10px;
+    margin: 0 2px;
+}
+
+.card.selected {
+    transform: translateY(-50px);
+}
+
+.my-hand .card:hover {
+    filter: brightness(90%);
+    cursor: pointer;
+}
+
+.hand {
+    display: flex;
+    flex-direction: column;
+}
+
+.my-hand {
+    flex-direction: column;
+
+    position: absolute;
+    top: 85%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.my-played {
+    position: absolute;
+    top: 65%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+}
+
+.player-one {
+    position: absolute;
+    top: 50%;
+    left: 6%;
+    transform: translate(-50%, -50%) rotate(90deg) scale(0.5);
+}
+
+.player-one-played {
+    position: absolute;
+    top: 50%;
+    left: 30%;
+    transform: translate(-50%, -50%)  scale(0.8);
+}
+
+.player-two {
+
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(180deg) scale(0.5);
+}
+
+.player-two-played {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+}
+
+.player-three {
+    position: absolute;
+    top: 50%;
+    left: 94%;
+    transform: translate(-50%, -50%) rotate(270deg) scale(0.5);
+}
+
+.player-three-played {
+    position: absolute;
+    top: 50%;
+    left: 70%;
+    transform: translate(-50%, -50%) scale(0.8);
+    display: flex;
+}
+
+.play-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    width: 150px;
+    height: 50px;
+    font-size: 24px;
+
+    border: 2px white solid;
+    background-color: transparent;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+}
+.play-btn:hover {
+    color: #00753c;
+    background-color: white;
+}
+
+.deck {
+    position: absolute;
+    top: 85%;
+    left: 20%;
+    transform: translate(-50%, -50%);
+}
+
+.deck .card:first-child {
+    top: 0;
+    left: 0;
+    z-index: 1;
+    border: 1px black solid;
+    border-radius: 10px;
+}
+.deck .card:last-child {
+    position: absolute;
+    top: 0;
+    left: 60px;
+    transform: rotate(90deg);
+    z-index: -1;
+}
+
+.deck p {
+    z-index: 2;
+    font-size: 32px;
+    background-color: rgba(0, 0, 0, .75);
+    color: white;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+}
+
+.message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-weight: 700;
+    font-size: 32px;
+}
+
+.card-container {
+    display: flex;
+}
+
+.username {
+    width: 100%;
+    text-align: center;
+    font-size: 28px;
+    color: white;
+    font-weight: 900;
+    margin-top: 10px;
+}
+
+
+.username-opp {
+    width: 100%;
+    text-align: center;
+    font-size: 74px;
+    color: white;
+    font-weight: 900;
+    margin-top: 30px;
+}
+
+.taken-amount {
+    position: absolute;
+    left: 105%;
+    transform: scale(0.6);
+}
+
+.taken-counter {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: black;
+    border-radius: 50%;
+    color: white;
+    font-size: 24px;
+}
+
+.card.clipped {
+    clip-path: circle(9% at 50% 50%);
+    transform: scale(3);
+    margin-bottom: 70px;
+}
+
+.taken-amount-left {
+    position: absolute;
+    left: 105%;
+}
+
+.taken-amount-right, .taken-amount-top {
+    position: absolute;
+    right: 105%;
+}
+
+.taken-amount-left .taken-counter {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-90deg);
+    width: 75px;
+    height: 75px;
+    font-size: 32px;
+}
+
+.taken-amount-right .taken-counter {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(90deg);
+    width: 75px;
+    height: 75px;
+    font-size: 32px;
+}
+
+.taken-amount-top .taken-counter {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(180deg);
+    width: 75px;
+    height: 75px;
+    font-size: 32px;
+}
+
+.scoreboard {
+    position: absolute;
+    top: 30px;
+    left: 40px;
+
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.75);
+    border-radius: 5px;
+}
+
+
+.scoreboard h3 {
+    text-decoration: underline;
+    margin-bottom: 10px;
+}
+
+.scoreboard .row {
+    display: flex;
+    margin: 5px 0;
+}
+
+.scoreboard hr {
+    border: none;
+    border-bottom: .5px black solid;
+}
+
+.scoreboard .row p:first-child {
+    margin-left: 5px;
+}
+
+.scoreboard .row p:last-child {
+    margin: 0 5px 0 7vw;
+    font-weight: 700;
+}
+
+.mult-btn {
+    position: absolute;
+    bottom: 50px;
+    right: 15vw;
+
+    width: 100px;
+    height: 40px;
+    font-size: 20px;
+
+    border: 2px white solid;
+    background-color: transparent;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+}
+.mult-btn:hover {
+    color: #00753c;
+    background-color: white;
+}
