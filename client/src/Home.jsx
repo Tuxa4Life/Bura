@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom'
 const Home = () => {
     const navigate = useNavigate()
 
-    const [name, setName] = useState('guest')
-    const [roomId, setRoomId] = useState('1')
+    const [name, setName] = useState('')
+    const [roomId, setRoomId] = useState('')
 
     const submit = (e) => {
         e.preventDefault()
