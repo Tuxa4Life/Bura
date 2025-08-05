@@ -130,24 +130,60 @@ io.on("connection", (socket) => {
             }
         }, 3000);
     });
+
+    socket.on('request-davi', ({ roomId }) => {
+        io.in(roomId).emit('send-davi-message')
+    })
+
+    socket.on('davi-accepted', ({roomId, game}) => {
+        game.multiplier = game.multiplier + 1
+        io.in(roomId).emit("initialize-game", game);
+        io.in(roomId).emit('close-davi-window')
+
+        io.in(roomId).emit(
+            "display-message",
+            `Offer accepted!`
+        );
+
+                
+        setTimeout(() => io.in(roomId).emit("remove-message"), 3000)
+    })
+
+    socket.on('davi-rejected', ({roomId, game}) => {
+        io.in(roomId).emit('close-davi-window')
+        game.players.forEach((player, i) => {
+            if (i % 2 === game.turn % 2) {
+                player.points += game.multiplier
+            }
+        })
+
+        io.in(roomId).emit(
+            "display-message",
+            `Offer rejected!`
+        );
+
+                
+        setTimeout(() => {
+            io.in(roomId).emit("remove-message")
+            startGame(game, roomId)
+        }, 3000)
+    })
 });
 
 const startGame = (game, roomId) => {
     const initialDeck = shuffle(cards);
 
-    if (!game?.deck?.length) {
-        game.deck = [...initialDeck];
+    game.deck = [...initialDeck];
+    game.trump = initialDeck[initialDeck.length - 1];
+    game.multiplier = 1;
 
-        game.players.forEach((e) => {
-            e.hand = dealCards(game.deck, 5);
-            e.taken = [];
-        });
+    game.players.forEach((player) => {
+        player.hand = dealCards(game.deck, 5);
+        player.taken = [];
+    });
 
-        game.trump = initialDeck[initialDeck.length - 1];
-
-        io.in(roomId).emit("initialize-game", game);
-    }
-}
+    io.in(roomId).emit("initialize-game", game);
+};
 
 const handleWin = (game, roomId) => {
     const scores = [0, 0];

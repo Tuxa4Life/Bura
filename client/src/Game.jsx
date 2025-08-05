@@ -3,10 +3,11 @@ import { useSockets } from './Context/useContext'
 import { useEffect, useState } from "react";
 import { images } from "./cards";
 import './Styles/game.css'
+import DaviWind from "./Components/DaviWind";
 
 const Game = () => {
     const { id } = useParams()
-    const { game, message, myId, players, joinRoom, leaveRoom, changeState, setRoomId } = useSockets()
+    const { game, message, myId, players, joinRoom, leaveRoom, changeState, setRoomId, requestDavi, daviWindow } = useSockets()
     const [myHand, setMyHand] = useState()
     const [selected, setSelected] = useState([])
     const [myIndex, setMyIndex] = useState(0)
@@ -32,6 +33,8 @@ const Game = () => {
         const index = game.players.findIndex(e => e.id === myId)
         setMyIndex(index)
     }, [game.players])
+
+    
 
     const select = (i) => {
         if (selected.includes(i)) {
@@ -74,7 +77,18 @@ const Game = () => {
         setSelected([])
     }
 
+    const davi = () => {
+        if (game?.turn !== myIndex) {
+            alert('It\'s not your turn yet')
+            return
+        }
+
+        requestDavi(game)
+    }
+
     return <div className="board">
+        { daviWindow && <DaviWind playerIndex={myIndex} players={game?.players} turn={game?.turn} multiplier={game?.multiplier}/> }
+
         <div className="scoreboard">
             <h3>Points</h3>
             
@@ -91,7 +105,7 @@ const Game = () => {
             </div>
         </div>
 
-        <button className="mult-btn">{game?.multiplier}x</button>
+        <button onClick={davi} className="mult-btn">{game?.multiplier}x</button>
 
         {!((selected.length !== 0) && (myIndex === game?.turn)) && <p className="message">{message}</p>}
 

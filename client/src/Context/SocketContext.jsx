@@ -20,6 +20,8 @@ const SocketProvider = ({ children }) => {
 
     const navigate = useNavigate()
 
+    const [daviWindow, setDaviWindow] = useState()
+    
     useEffect(() => {
         socket.on('connect', () => {
             setMyId(socket.id);
@@ -46,12 +48,19 @@ const SocketProvider = ({ children }) => {
             setTimeout(() => setMessage(''), 500)
         })
 
+        socket.on('send-davi-message', () => {
+            setDaviWindow(true)
+        })
+        socket.on('close-davi-window', () => {
+            setDaviWindow(false)
+        })
+
         return () => {
             socket.off('getPlayers');
             socket.off('initialize-game');
             socket.off('changed-game-state');
             socket.off('connect')
-            socket.off('test')
+            socket.off('send-davi-message')
         }
     }, [])
 
@@ -67,7 +76,19 @@ const SocketProvider = ({ children }) => {
         socket.emit('change-game-state', { roomId, game })
     }
 
-    const data = { game, message, setGame, setRoomId, players, myId, joinRoom, leaveRoom, changeState }
+    const requestDavi = () => {
+        socket.emit('request-davi', { roomId })
+    }
+
+    const acceptDavi = () => {
+        socket.emit('davi-accepted', { roomId, game })
+    }
+
+    const rejectDavi = () => {
+        socket.emit('davi-rejected', { roomId, game })
+    }
+
+    const data = { game, message, daviWindow, setGame, setRoomId, players, myId, joinRoom, leaveRoom, changeState, requestDavi, acceptDavi, rejectDavi }
     return <SocketContext.Provider value={data}>
         {children}
     </SocketContext.Provider>
