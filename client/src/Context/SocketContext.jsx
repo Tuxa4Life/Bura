@@ -2,7 +2,7 @@ import { createContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { io } from 'socket.io-client'
 
-const socket = io('http://localhost:5000')
+const socket = io(process.env.REACT_APP_SERVER_URL || 'http://localhost:5000')
 
 const SocketContext = createContext()
 const SocketProvider = ({ children }) => {
