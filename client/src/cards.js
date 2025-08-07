@@ -1,6 +1,6 @@
 const generateImages = () => {
     const suits = ['clubs', 'diamonds', 'hearts', 'spades']
-    const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
+    const values = ['6', '7', '8', '9', 'J', 'Q', 'K', '10', 'A']
 
     const cardImages = {}
 
