@@ -6,8 +6,8 @@ const socket = io(process.env.REACT_APP_SERVER_URL || 'http://localhost:5000')
 
 const SocketContext = createContext()
 const SocketProvider = ({ children }) => {
-    const [name, setName] = useState('')
-    const [roomId, setRoomId] = useState('')
+    const [name, setName] = useState('Guest')
+    const [roomId, setRoomId] = useState('1')
 
     const [message, setMessage] = useState('')
     const [myIndex, setMyIndex] = useState(null)

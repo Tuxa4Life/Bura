@@ -68,15 +68,15 @@ io.on('connection', (socket) => {
         currentPlayer.played = played
         currentPlayer.hand = currentPlayer.hand.filter((card) => !played.includes(card))
 
-        io.in(roomId).emit('update-state', game)
-        game.turn = (game.turn + 1) % 4
-
+        
         const hasBura = played.every((card) => card === game.trump)
         if (hasBura) {
             handleBura(roomId)
             return
         }
-
+        
+        game.turn = (game.turn + 1) % 4
+        io.in(roomId).emit('update-state', game)
 
         const allPlayed = game.players.every((player) => player.played.length !== 0)
         if (!allPlayed) return
