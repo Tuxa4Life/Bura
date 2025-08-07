@@ -25,7 +25,7 @@ const DaviWind = ({ players, playerIndex, turn, multiplier }) => {
                 <h1 style={{ textAlign: 'center', marginTop: '15px' }}>{players[turn]?.name} <br /> offered you <br /> {getWording(multiplier)}</h1>
 
                 <div className="buttons" style={{ display: 'flex', width: '100%', justifyContent: 'space-evenly', marginTop: '20px' }}>
-                    <button onClick={acceptDavi} style={{ width: '120px', height: '40px', backgroundColor: 'limegreen', border: 'none', fontSize: '24px', cursor: 'pointer' }}>Accept</button>
+                    <button onClick={acceptDavi} style={{ width: '120px', height: '40px', backgroundColor: 'limegreen', border: 'none', fontSize: '24px', cursor: 'pointer', color: 'white' }}>Accept</button>
                     <button onClick={rejectDavi} style={{ width: '120px', height: '40px', backgroundColor: 'red', border: 'none', color: 'white', fontSize: '24px', cursor: 'pointer' }}>Reject</button>
                 </div>
             </div>

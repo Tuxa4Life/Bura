@@ -1,43 +1,37 @@
-import { createContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { createContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client'
 
 const socket = io(process.env.REACT_APP_SERVER_URL || 'http://localhost:5000')
 
 const SocketContext = createContext()
 const SocketProvider = ({ children }) => {
+    const [name, setName] = useState('')
     const [roomId, setRoomId] = useState('1')
-    const [message, setMessage] = useState('')
 
-    const [players, setPlayers] = useState([])
+    const [message, setMessage] = useState('')
+    const [myIndex, setMyIndex] = useState(null)
+
     const [game, setGame] = useState({
         players: [],
         deck: [],
         trump: '',
         turn: 0
     })
-    const [myId, setMyId] = useState('')
 
     const navigate = useNavigate()
 
     const [daviWindow, setDaviWindow] = useState()
-    
+
     useEffect(() => {
-        socket.on('connect', () => {
-            setMyId(socket.id);
-        });
+        const handleBeforeUnload = () => {
+            socket.disconnect()
+        }
 
-        socket.on('getPlayers', (data) => {
-            setPlayers(data);
+        window.addEventListener('beforeunload', handleBeforeUnload)
 
-            if (data.length === 4) {
-                socket.emit('start-game', roomId);
-            }
-        });
-
-        socket.on('initialize-game', (data) => {
+        socket.on('update-state', (data) => {
             setGame(data)
-            console.log('Initialized called', data)
         })
 
         socket.on('display-message', (text) => {
@@ -45,50 +39,62 @@ const SocketProvider = ({ children }) => {
         })
 
         socket.on('remove-message', () => {
-            setTimeout(() => setMessage(''), 500)
+            setMessage('')
         })
 
         socket.on('send-davi-message', () => {
             setDaviWindow(true)
         })
+
         socket.on('close-davi-window', () => {
             setDaviWindow(false)
         })
 
         return () => {
-            socket.off('getPlayers');
-            socket.off('initialize-game');
-            socket.off('changed-game-state');
+            window.removeEventListener('beforeunload', handleBeforeUnload)
+
             socket.off('connect')
+            socket.off('update-state')
+            socket.off('display-message')
+            socket.off('remove-message')
             socket.off('send-davi-message')
+            socket.off('close-davi-window')
         }
     }, [])
 
+    useEffect(() => {
+        if (myIndex === null || myIndex === -1) {
+            const index = game.players.findIndex(e => {
+                console.log(e.id, socket.id)
+                return e.id === socket.id
+            })
+            setMyIndex(index)
+        }
+    }, [game.players])
 
-
-    const joinRoom = (name_and_id) => socket.emit('joinRoom', name_and_id)
+    const joinRoom = (name_and_id) => socket.emit('join-room', name_and_id)
     const leaveRoom = (roomId) => { // TODO: fix leaving
         socket.emit('leaveRoom', roomId)
         navigate('/')
     }
 
-    const changeState = (game, roomId) => {
-        socket.emit('change-game-state', { roomId, game })
+    const changeState = (chosen) => {
+        socket.emit('player-played', { roomId, played: chosen })
     }
 
     const requestDavi = () => {
-        socket.emit('request-davi', { roomId })
+        socket.emit('request-davi', roomId)
     }
 
     const acceptDavi = () => {
-        socket.emit('davi-accepted', { roomId, game })
+        socket.emit('davi-accepted', roomId)
     }
 
     const rejectDavi = () => {
-        socket.emit('davi-rejected', { roomId, game })
+        socket.emit('davi-rejected', roomId)
     }
 
-    const data = { game, message, daviWindow, setGame, setRoomId, players, myId, joinRoom, leaveRoom, changeState, requestDavi, acceptDavi, rejectDavi }
+    const data = { name, setName, roomId, setRoomId, game, myIndex, message, daviWindow, setGame, joinRoom, leaveRoom, changeState, requestDavi, acceptDavi, rejectDavi }
     return <SocketContext.Provider value={data}>
         {children}
     </SocketContext.Provider>

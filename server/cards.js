@@ -57,11 +57,11 @@ const countPoints = (takenCards) => {
     takenCards.forEach(card => {
         const value = card.split('_')[1]
         switch(value) {
-            case '10': output += 10; break;
             case 'J': output += 2; break;
             case 'Q': output += 3; break;
             case 'K': output += 4; break;
-            case 'A': output += 5; break;
+            case '10': output += 10; break;
+            case 'A': output += 11; break;
             default: output += 0; break;
         }
     })

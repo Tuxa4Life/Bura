@@ -1,16 +1,14 @@
-import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useSockets } from './Context/useContext'
 
 const Home = () => {
     const navigate = useNavigate()
 
-    const [name, setName] = useState('')
-    const [roomId, setRoomId] = useState('')
+    const { name, roomId, setName, setRoomId } = useSockets()
 
     const submit = (e) => {
         e.preventDefault()
         navigate(`/game/${roomId}`)
-        localStorage.setItem('name', name)
     }
 
     return <div style={{width: '100%', height: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>

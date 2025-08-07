@@ -1,51 +1,41 @@
-const express = require("express");
-const http = require("http");
-const { Server } = require("socket.io");
+const express = require('express')
+const http = require('http')
+const { Server } = require('socket.io')
 
-const app = express();
-const cors = require("cors");
-const {
-    shuffle,
-    cards,
-    dealCards,
-    getWinnerIndex,
-    countPoints,
-} = require("./cards");
+const app = express()
+const cors = require('cors')
+const { shuffle, cards, dealCards, getWinnerIndex, countPoints } = require('./cards')
 
-app.use(cors());
+app.use(cors())
 
-const server = http.createServer(app);
+const server = http.createServer(app)
 const io = new Server(server, {
-    cors: { origin: "*" }
-});
+    cors: { origin: '*' },
+})
 
-const games = {};
+const games = {}
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5000
 server.listen(PORT, () => {
-    console.log(`Server is running on port: ${PORT}`);
-});
+    console.log(`Server is running on port: ${PORT}`)
+})
 
-io.on("connection", (socket) => {
-    //! Joining - leaving rooms
-    socket.on("joinRoom", async ({ name, roomId }) => {
-        console.log(`${name} joined room: ${roomId}`)
-        socket.data.username = name;
-        socket.data.roomId = roomId;
-        socket.join(roomId);
+io.on('connection', (socket) => {
+    socket.on('join-room', async ({ name, roomId }) => {
+        socket.join(roomId)
 
         if (!games[roomId]) {
             games[roomId] = {
                 players: [],
                 deck: [],
-                trump: "",
+                trump: '',
                 multiplier: 1,
                 turn: 0,
-            };
+                lastDavi: null,
+            }
         }
 
-        const game = games[roomId];
-
+        const game = games[roomId]
         if (!game.players.find((p) => p.id === socket.id)) {
             game.players.push({
                 id: socket.id,
@@ -54,100 +44,97 @@ io.on("connection", (socket) => {
                 played: [],
                 taken: [],
                 points: 0,
-            });
+            })
         }
 
-        io.to(roomId).emit("getPlayers", game.players);
-    });
+        console.log(`${name} joined Room: ${roomId}`)
+        io.in(roomId).emit('update-state', game)
 
-    //! GAME STUFF
-    socket.on("start-game", async (roomId) => {
-        const game = games[roomId];
-        startGame(game, roomId);
-    });
+        if (game.players.length === 4) {
+            startGame(roomId)
+        }
+    })
 
-    socket.on("change-game-state", async ({ game, roomId }) => {
-        io.in(roomId).emit(
-            "display-message",
-            `${game.players[game.turn].name}'s turn.`
-        );
-        io.in(roomId).emit("initialize-game", game);
-
-        let allPlayed = true;
-        game.players.map((player) => {
-            allPlayed = allPlayed && player.played.length !== 0;
-            console.log(`${player.name}: ${player.hand}`)
-        });
-
-        if (!allPlayed) {
-            return;
+    socket.on('player-played', ({ roomId, played }) => {
+        const game = games[roomId]
+        if (!game) {
+            console.log(`Game with ID: ${roomId} cannot be found.`)
+            return
         }
 
-        // If all players played their hands
-        const input = [];
+        const currentPlayer = game.players[game.turn]
+        currentPlayer.played = played
+        currentPlayer.hand = currentPlayer.hand.filter((card) => !played.includes(card))
+
+        game.turn = (game.turn + 1) % 4
+
+        io.in(roomId).emit('update-state', game)
+
+        const allPlayed = game.players.every((player) => player.played.length !== 0)
+        if (!allPlayed) return
+
+        const hands = []
         game.players.forEach((player) => {
-            input.push(player.played);
-        });
+            hands.push(player.played)
+            player.played = []
+        })
 
-        const winnerIndex = getWinnerIndex(input, game.trump);
-        const winner = game.players[winnerIndex];
+        const winnerIndex = getWinnerIndex(hands, game.trump)
+        game.players[winnerIndex].taken.push([hands])
+        game.turn = winnerIndex
 
-        winner.taken.push([input]);
-        game.turn = winnerIndex;
-
-        game.players.forEach((player) => {
-            player.played = [];
-        });
-
-        let i = winnerIndex;
-        while (
-            game.players.some((p) => p.hand.length < 5) &&
-            game.deck.length > 0
-        ) {
-            game.players[i].hand = [
-                ...game.players[i].hand,
-                ...dealCards(game.deck, 1),
-            ];
-            i = (i + 1) % 4;
+        let i = winnerIndex
+        while (game.deck.length > 0 && game.players.some((p) => p.hand.length < 5)) {
+            game.players[i].hand.push(...dealCards(game.deck, 1))
+            i = (i + 1) % 4
         }
 
-        io.in(roomId).emit(
-            "display-message",
-            `${game.players[winnerIndex].name} takes this hand.`
-        );
         setTimeout(() => {
-            io.in(roomId).emit("initialize-game", game);
+            io.in(roomId).emit('update-state', game)
 
-            if (
-                game.deck.length === 0 &&
-                game.players.some((p) => p.hand.length === 0)
-            ) {
-                handleWin(game, roomId);
-            } else {
-                io.in(roomId).emit("remove-message");
+            if (game.deck.length === 0 && game.players.some((p) => p.hand.length === 0)) {
+                handleWin(roomId)
             }
-        }, 3000);
-    });
+        }, 3000)
+    })
 
-    socket.on('request-davi', ({ roomId }) => {
+    socket.on('request-davi', (roomId) => {
+        const game = games[roomId]
+        if (!game) {
+            console.log(`Game with ID: ${roomId} cannot be found.`)
+            return
+        }
+
+        game.lastDavi = game.turn % 2
+
+        io.in(roomId).emit('update-state', game)
         io.in(roomId).emit('send-davi-message')
     })
 
-    socket.on('davi-accepted', ({roomId, game}) => {
+    socket.on('davi-accepted', (roomId) => {
+        const game = games[roomId]
+        if (!game) {
+            console.log(`Game with ID: ${roomId} cannot be found.`)
+            return
+        }
+
         game.multiplier = game.multiplier + 1
-        io.in(roomId).emit("initialize-game", game);
+
+        console.log(`Point multiplier increased: ${game.multiplier}`)
+        io.in(roomId).emit('update-state', game)
         io.in(roomId).emit('close-davi-window')
 
-        io.in(roomId).emit(
-            "display-message",
-            `Offer accepted!`
-        );
-
-                
-        setTimeout(() => io.in(roomId).emit("remove-message"), 3000)
+        io.in(roomId).emit('display-message', 'Offer was accepted!')
+        setTimeout(() => io.in(roomId).emit('remove-message'), 3000)
     })
 
-    socket.on('davi-rejected', ({roomId, game}) => {
+    socket.on('davi-rejected', (roomId) => {
+        const game = games[roomId]
+        if (!game) {
+            console.log(`Game with ID: ${roomId} cannot be found.`)
+            return
+        }
+
         io.in(roomId).emit('close-davi-window')
         game.players.forEach((player, i) => {
             if (i % 2 === game.turn % 2) {
@@ -155,76 +142,90 @@ io.on("connection", (socket) => {
             }
         })
 
-        io.in(roomId).emit(
-            "display-message",
-            `Offer rejected!`
-        );
-
-                
+        io.in(roomId).emit('display-message', 'Offer was rejected.')
         setTimeout(() => {
-            io.in(roomId).emit("remove-message")
-            startGame(game, roomId)
+            io.in(roomId).emit('remove-message')
+            startGame(roomId)
         }, 3000)
     })
-});
 
-const startGame = (game, roomId) => {
-    if (!game) return;
+    socket.on('disconnect', () => {
 
-    const initialDeck = shuffle(cards);
+        for (const roomId in games) {
+            const game = games[roomId]
 
-    game.deck = [...initialDeck];
-    game.trump = initialDeck[initialDeck.length - 1];
-    game.multiplier = 1;
+            const playerIndex = game.players.findIndex((p) => p.id === socket.id)
+            if (playerIndex !== -1) {
+                console.log(`${game.players[playerIndex].name} left Room: ${roomId}`)
+                game.players.splice(playerIndex, 1)
 
-    game.players.forEach((player) => {
-        player.hand = dealCards(game.deck, 5);
-        player.taken = [];
-        player.played = []
-    });
+                if (game.players.length === 0) {
+                    console.log(`All players left Room: ${roomId}. Deleting game.`)
+                    delete games[roomId]
+                } else {
+                    io.in(roomId).emit('update-state', game)
+                }
 
-    io.in(roomId).emit("initialize-game", game);
-};
-
-const handleWin = (game, roomId) => {
-    const scores = [0, 0];
-    const winnerIndexes = [];
-    game.players.forEach((player, i) => {
-        scores[i % 2] += countPoints(player.taken.flat(Infinity));
-    });
-
-    if (scores[0] > scores[1]) {
-        game.players.forEach((player, i) => {
-            if (i % 2 === 0) {
-                player.points += game.multiplier;
-                winnerIndexes.push(i);
+                break
             }
-        });
+        }
+    })
+})
 
-        io.in(roomId).emit(
-            "display-message",
-            `${game.players[0].name} and ${game.players[2].name} \nwin this round with ${scores[0]} points!`
-        );
-    } else if (scores[0] < scores[1]) {
-        game.players.forEach((player, i) => {
-            if (i % 2 !== 0) {
-                player.points += game.multiplier;
-                winnerIndexes.push(i);
-            }
-        });
-
-        io.in(roomId).emit(
-            "display-message",
-            `${game.players[1].name} and ${game.players[3].name} \nwin this round with ${scores[1]} points!`
-        );
-    } else {
-        io.in(roomId).emit("display-message", `This round was a draw!`);
+const startGame = (roomId) => {
+    const game = games[roomId]
+    if (!game) {
+        console.log(`Game with ID: ${roomId} cannot be found.`)
+        return
     }
 
-    startGame(game, roomId);
-    game.turn = winnerIndexes[Math.round(Math.random())];
+    const deck = shuffle(cards)
+    game.deck = [...deck]
+    game.trump = deck[deck.length - 1]
+    game.multiplier = 1
+    game.lastDavi = null
+
+    game.players.forEach((player) => {
+        player.hand = dealCards(game.deck, 5)
+        player.taken = []
+        player.played = []
+    })
+
+    console.log(`Started game: `, game)
+    io.in(roomId).emit('update-state', game)
+}
+
+const handleWin = (roomId) => {
+    const game = games[roomId]
+    if (!game) {
+        console.log(`Game with ID: ${roomId} cannot be found.`)
+        return
+    }
+
+    const scores = [0, 0]
+    const winnerIndexes = []
+    game.players.forEach((player, i) => {
+        scores[i % 2] += countPoints(player.taken.flat(Infinity))
+    })
+
+    const [team0, team1] = scores
+    if (team0 !== team1) {
+        const winnerTeam = team0 > team1 ? 0 : 1
+        game.players.forEach((player, i) => {
+            if (i % 2 === winnerTeam) {
+                player.points += game.multiplier
+                winnerIndexes.push(i)
+            }
+        })
+    }
+
+    game.turn = winnerIndexes[Math.round(Math.random())]
+
+    console.log(scores)
+    io.in(roomId).emit('display-message', `${game.players[winnerIndexes[0]].name} and ${game.players[winnerIndexes[1]].name} won with ${scores[winnerIndexes[0]]} points!`)
 
     setTimeout(() => {
-        io.in(roomId).emit("remove-message");
-    }, 3000);
-};
+        io.in(roomId).emit('remove-message')
+        startGame(roomId)
+    }, 3000)
+}
