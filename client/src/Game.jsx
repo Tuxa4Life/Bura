@@ -6,9 +6,12 @@ import './Styles/game.css'
 import DaviWind from "./Components/DaviWind";
 
 const Game = () => {
+    const [cheats] = useState(false)
+
     const { id } = useParams()
     const { game, name, roomId, message, myIndex, joinRoom, leaveRoom, changeState, requestDavi, daviWindow } = useSockets()
     const [selected, setSelected] = useState([])
+
 
     useEffect(() => {
         joinRoom({ name, roomId })
@@ -67,8 +70,8 @@ const Game = () => {
                 <div className={`player-${position} hand`}>
                     <div className="card-container">
                         {
-                            game?.players[playerIndex]?.hand.map((_, i) => (
-                                <img key={`${i}-${positionClass}`} className="card" src="../cards/back_light.png" alt="Error" />
+                            game?.players[playerIndex]?.hand.map((e, i) => (
+                                <img key={`${i}-${positionClass}`} className="card" src={cheats ? images[e] : "../cards/back_light.png"} alt="Error" />
                             ))
                         }
                     </div>
