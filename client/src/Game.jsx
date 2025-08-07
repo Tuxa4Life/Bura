@@ -147,15 +147,15 @@ const Game = () => {
 
         {
             (game?.players.length !== 4) &&
-            <div style={{ width: '100%', height: '100dvh', position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: '1', backgroundColor: 'white' }}>
-                <h1>ROOM ID: {id}</h1>
+            <div style={{ width: '100%', height: '100dvh', position: 'fixed', top: '0', left: '0', backgroundColor: 'white', display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
+                <h1 style={{marginTop: '25dvh'}}>ROOM ID: {id}</h1>
                 <h1>Waiting for players... ({game?.players.length}/4)</h1>
-                <h3 style={{ margin: '0' }}>PLAYERS:</h3>
+                <h3 style={{ margin: '20px 0 0 0' }}>PLAYERS:</h3>
                 <ol>
                     {game?.players.map((e, i) => <li key={i}>{e.name}</li>)}
                 </ol>
 
-                <button onClick={() => leaveRoom(id)}>Go back</button>
+                <button style={{marginTop: '50px'}} onClick={() => leaveRoom(id)}>Go back</button>
             </div>
         }
     </div>

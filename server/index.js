@@ -21,6 +21,8 @@ server.listen(PORT, () => {
 })
 
 io.on('connection', (socket) => {
+    console.log('Client connected: ', socket.id)
+
     socket.on('join-room', async ({ name, roomId }) => {
         socket.join(roomId)
 

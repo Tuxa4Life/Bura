@@ -23,7 +23,7 @@ const Home = () => {
 
             <div style={{margin: '5px 0 20px 0'}} className="field">
                 <label>Room ID: </label>
-                <input value={roomId} onChange={e => setRoomId(e.target.value)} required type="text" />
+                <input value={roomId} onChange={e => setRoomId(e.target.value.toLowerCase().replace(' ', ''))} required type="text" />
             </div>
 
             <button type="submit">Join Game</button>
