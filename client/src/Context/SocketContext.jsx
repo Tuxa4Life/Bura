@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client'
 
@@ -70,9 +70,12 @@ const SocketProvider = ({ children }) => {
             })
             setMyIndex(index)
         }
-    }, [game.players])
+    }, [game.players, myIndex])
 
-    const joinRoom = (name_and_id) => socket.emit('join-room', name_and_id)
+    const joinRoom = useCallback((name_and_id) => {
+        socket.emit('join-room', name_and_id);
+    }, []);
+
     const leaveRoom = () => {
         socket.emit('leave-room', roomId)
         navigate('/')

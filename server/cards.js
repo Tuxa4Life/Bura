@@ -81,9 +81,27 @@ const countPoints = (takenCards) => {
     return output
 }
 
+const sortCards = (cards, trump) => {
+    const suitePriority = {
+        clubs: ['clubs', 'hearts', 'spades', 'diamonds'],
+        spades: ['spades', 'hearts', 'clubs', 'diamonds'],
+        hearts: ['hearts', 'spades', 'diamonds', 'clubs'],
+        diamonds: ['diamonds', 'spades', 'hearts', 'clubs'],
+    }
+
+    const order = suitePriority[trump]
+
+    return cards.sort((a, b) => {
+        const suiteA = a.split('_')[0]
+        const suiteB = b.split('_')[0]
+
+        return order.indexOf(suiteA) - order.indexOf(suiteB)
+    })
+}
+
 const shuffle = (arr) => arr.sort(() => Math.random() - 0.5)
 const dealCards = (deck, n) => deck.splice(0, n)
 
 const cards = generateKeys()
 
-module.exports = { cards, shuffle, dealCards, getWinnerIndex, countPoints }
+module.exports = { cards, shuffle, dealCards, sortCards, getWinnerIndex, countPoints }

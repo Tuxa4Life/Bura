@@ -4,7 +4,7 @@ const { Server } = require('socket.io')
 
 const app = express()
 const cors = require('cors')
-const { shuffle, cards, dealCards, getWinnerIndex, countPoints } = require('./cards')
+const { shuffle, cards, dealCards, getWinnerIndex, countPoints, sortCards } = require('./cards')
 
 app.use(cors())
 
@@ -69,6 +69,7 @@ io.on('connection', (socket) => {
         currentPlayer.hand = currentPlayer.hand.filter((card) => !played.includes(card))
 
         io.in(roomId).emit('update-state', game)
+        game.turn = (game.turn + 1) % 4
 
         const hasBura = played.every((card) => card === game.trump)
         if (hasBura) {
@@ -76,7 +77,6 @@ io.on('connection', (socket) => {
             return
         }
 
-        game.turn = (game.turn + 1) % 4
 
         const allPlayed = game.players.every((player) => player.played.length !== 0)
         if (!allPlayed) return
@@ -96,6 +96,8 @@ io.on('connection', (socket) => {
             game.players[i].hand.push(...dealCards(game.deck, 1))
             i = (i + 1) % 4
         }
+        
+        game.players.forEach(player => player.hand = sortCards(player.hand, game.trump.split('_')[0]))
 
         setTimeout(() => {
             io.in(roomId).emit('update-state', game)
@@ -198,7 +200,7 @@ const startGame = (roomId) => {
     game.lastDavi = null
 
     game.players.forEach((player) => {
-        player.hand = dealCards(game.deck, 5)
+        player.hand = sortCards(dealCards(game.deck, 5), game.trump.split('_')[0])
         player.taken = []
         player.played = []
     })

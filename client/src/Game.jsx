@@ -12,7 +12,7 @@ const Game = () => {
 
     useEffect(() => {
         joinRoom({ name, roomId })
-    }, [])
+    }, [name, roomId, joinRoom])
 
     const select = (i) => {
         if (selected.includes(i)) {
@@ -68,7 +68,7 @@ const Game = () => {
                     <div className="card-container">
                         {
                             game?.players[playerIndex]?.hand.map((_, i) => (
-                                <img key={`${i}-${positionClass}`} className="card" src="../cards/back_light.png" />
+                                <img key={`${i}-${positionClass}`} className="card" src="../cards/back_light.png" alt="Error" />
                             ))
                         }
                     </div>
@@ -76,7 +76,7 @@ const Game = () => {
                         {game?.players[playerIndex]?.name}
                     </p>
                     <div className={`taken-amount-${positionClass}`}>
-                        <img style={{ filter: 'brightness(80%) invert(1)' }} className="card" src="../cards/back_light.png" />
+                        <img style={{ filter: 'brightness(80%) invert(1)' }} className="card" src="../cards/back_light.png" alt="Error" />
                         <div className="taken-counter">
                             {game?.players[playerIndex]?.taken?.flat(3).length}
                         </div>
@@ -85,7 +85,7 @@ const Game = () => {
                 <div className={`player-${position}-played`}>
                     {
                         game?.players[playerIndex]?.played.map((e, i) => (
-                            <img key={`${i}-${positionClass}-played`} className="card" src={images[e]} />
+                            <img key={`${i}-${positionClass}-played`} className="card" src={images[e]} alt="Error" />
                         ))
                     }
                 </div>
@@ -124,24 +124,24 @@ const Game = () => {
         <div className="my-hand hand">
             <div className="card-container">
                 {
-                    game?.players[myIndex]?.hand?.map((e, i) => <img onClick={() => select(i)} key={i} src={images[e]} className={`card ${selected.includes(i) ? 'selected' : ''}`} />)
+                    game?.players[myIndex]?.hand?.map((e, i) => <img onClick={() => select(i)} key={i} src={images[e]} className={`card ${selected.includes(i) ? 'selected' : ''}`} alt="Error" />)
                 }
             </div>
             <div className="taken-amount">
-                <img style={{ filter: 'brightness(80%) invert(1)' }} className="card" src="../cards/back_light.png" />
+                <img style={{ filter: 'brightness(80%) invert(1)' }} className="card" src="../cards/back_light.png" alt="Error" />
                 <div className="taken-counter">{game?.players[myIndex]?.taken?.flat(Infinity).length}</div>
             </div>
         </div>
         <div className="my-played">
             {
                 game?.players[myIndex]?.played.map((e, i) => {
-                    return <img key={`${i}-played`} className="card" src={images[e]} />
+                    return <img key={`${i}-played`} className="card" src={images[e]} alt="Error" />
                 })
             }
         </div>
 
         <div className="deck">
-            <img className={`card ${images[game?.deck[game?.deck?.length - 1]] ? '' : 'clipped'}`} src={images[game?.deck[game?.deck?.length - 1]] || `../cards/${game?.trump?.split('_')[0]}_A.png`} />
+            <img className={`card ${images[game?.deck[game?.deck?.length - 1]] ? '' : 'clipped'}`} src={images[game?.deck[game?.deck?.length - 1]] || `../cards/${game?.trump?.split('_')[0]}_A.png`} alt="Error" />
             <p style={{ opacity: game?.deck.length !== 0 ? '1' : '0' }}>{game?.deck.length}</p>
         </div>
 
