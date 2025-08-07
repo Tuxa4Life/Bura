@@ -73,8 +73,8 @@ const SocketProvider = ({ children }) => {
     }, [game.players])
 
     const joinRoom = (name_and_id) => socket.emit('join-room', name_and_id)
-    const leaveRoom = (roomId) => { // TODO: fix leaving
-        socket.emit('leaveRoom', roomId)
+    const leaveRoom = () => {
+        socket.emit('leave-room', roomId)
         navigate('/')
     }
 

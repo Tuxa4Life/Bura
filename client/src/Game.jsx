@@ -26,14 +26,16 @@ const Game = () => {
         const chosen = selected.map(i => game?.players[myIndex]?.hand[i])
         const suites = chosen.map(e => e.split('_')[0])
 
-        if (!suites.every(val => val === suites[0]) && game.players[(myIndex - 1 + 4) % 4].played.length === 0) {
-            alert('Cards must be of same suit!')
-            return
-        }
+        if (!suites.every(e => e === game?.trump)) {
+            if (!suites.every(val => val === suites[0]) && game.players[(myIndex - 1 + 4) % 4].played.length === 0) {
+                alert('Cards must be of same suit!')
+                return
+            }
 
-        if (game.players[(myIndex - 1 + 4) % 4].played.length !== 0 && selected.length !== game.players[(myIndex - 1 + 4) % 4].played.length) {
-            alert('You must play same amounts of cards.')
-            return
+            if (game.players[(myIndex - 1 + 4) % 4].played.length !== 0 && selected.length !== game.players[(myIndex - 1 + 4) % 4].played.length) {
+                alert('You must play same amounts of cards.')
+                return
+            }
         }
 
         changeState(chosen)
@@ -56,7 +58,7 @@ const Game = () => {
 
     const oppHands = [1, 2, 3].map((offset) => {
         const playerIndex = (myIndex + offset) % 4;
-        const position = ['one', 'two', 'three'][offset - 1]; // just for classNames
+        const position = ['one', 'two', 'three'][offset - 1]; // classNames
         const rotate = offset === 2 ? '180deg' : '0deg'; // top player
         const positionClass = ['left', 'top', 'right'][offset - 1];
 
@@ -113,11 +115,11 @@ const Game = () => {
         <button onClick={davi} className="mult-btn">{game?.multiplier}x</button>
 
         {!((selected.length !== 0) && (myIndex === game?.turn)) && <p className="message">{message}</p>}
-        { (myIndex === game?.turn && !message && (selected.length === 0)) && <p className="message">Your turn!</p> }
+        {(myIndex === game?.turn && !message && (selected.length === 0)) && <p className="message">Your turn!</p>}
 
         {((selected.length !== 0) && (myIndex === game?.turn)) && <button onClick={play} className="play-btn">PLAY</button>}
 
-        { oppHands }
+        {oppHands}
 
         <div className="my-hand hand">
             <div className="card-container">
@@ -140,7 +142,7 @@ const Game = () => {
 
         <div className="deck">
             <img className={`card ${images[game?.deck[game?.deck?.length - 1]] ? '' : 'clipped'}`} src={images[game?.deck[game?.deck?.length - 1]] || `../cards/${game?.trump?.split('_')[0]}_A.png`} />
-            <p style={{opacity: game?.deck.length !== 0 ? '1' : '0'}}>{game?.deck.length}</p>
+            <p style={{ opacity: game?.deck.length !== 0 ? '1' : '0' }}>{game?.deck.length}</p>
         </div>
 
         {

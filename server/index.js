@@ -66,9 +66,15 @@ io.on('connection', (socket) => {
         currentPlayer.played = played
         currentPlayer.hand = currentPlayer.hand.filter((card) => !played.includes(card))
 
-        game.turn = (game.turn + 1) % 4
-
         io.in(roomId).emit('update-state', game)
+
+        const hasBura = played.every((card) => card === game.trump)
+        if (hasBura) {
+            handleBura(roomId)
+            return
+        }
+
+        game.turn = (game.turn + 1) % 4
 
         const allPlayed = game.players.every((player) => player.played.length !== 0)
         if (!allPlayed) return
@@ -149,8 +155,12 @@ io.on('connection', (socket) => {
         }, 3000)
     })
 
-    socket.on('disconnect', () => {
+    socket.on('leave-room', (roomId) => {
+        socket.leave(roomId)
+        console.log(`${socket.id} manually left Room: ${roomId}`)
+    })
 
+    socket.on('disconnect', () => {
         for (const roomId in games) {
             const game = games[roomId]
 
@@ -224,6 +234,26 @@ const handleWin = (roomId) => {
     console.log(scores)
     io.in(roomId).emit('display-message', `${game.players[winnerIndexes[0]].name} and ${game.players[winnerIndexes[1]].name} won with ${scores[winnerIndexes[0]]} points!`)
 
+    setTimeout(() => {
+        io.in(roomId).emit('remove-message')
+        startGame(roomId)
+    }, 3000)
+}
+
+const handleBura = (roomId) => {
+    const game = games[roomId]
+    if (!game) {
+        console.log(`Game with ID: ${roomId} cannot be found.`)
+        return
+    }
+
+    game.players.forEach((player, i) => {
+        if (i % 2 === game.turn % 2) {
+            player.points += game.multiplier
+        }
+    })
+
+    io.in(roomId).emit('display-message', `${game.players[game.turn]} has aquired Bura!`)
     setTimeout(() => {
         io.in(roomId).emit('remove-message')
         startGame(roomId)

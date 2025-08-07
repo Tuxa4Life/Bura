@@ -13,6 +13,6 @@ const generateImages = () => {
 
     return cardImages
 }
-const images = generateImages()
 
+const images = generateImages()
 export { images }
