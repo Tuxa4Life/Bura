@@ -155,7 +155,6 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-
 }
 
 .message {
@@ -295,8 +294,8 @@
 
 .mult-btn {
     position: absolute;
-    bottom: 50px;
-    right: 15vw;
+    bottom: 13vh;
+    right: 5vw;
 
     width: 100px;
     height: 40px;
@@ -311,4 +310,37 @@
 .mult-btn:hover {
     color: #00753c;
     background-color: white;
+}
+
+@media only screen and (max-width: 1090px) {
+    .card {
+        width: 75px;
+    }
+}
+
+@media only screen and (max-width: 930px) {
+    .card {
+        width: 50px;
+    }
+    
+    .mult-btn {
+        width: 60px;
+        height: 30px;
+        font-size: 16px;
+    }
+
+    .play-btn {
+        width: 90px;
+        height: 35px;
+        font-size: 20px;
+    }
+
+    .my-hand {
+        scale: 1.2;
+        transform-origin: center;
+    }
+
+    .deck {
+        left: 10%;
+    }
 }
