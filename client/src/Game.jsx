@@ -68,7 +68,7 @@ const Game = () => {
         return (
             <React.Fragment key={`player-${position}`}>
                 <div className={`player-${position} hand`}>
-                    <div className="card-container">
+                    <div className="card-container  opp-cards">
                         {
                             game?.players[playerIndex]?.hand.map((e, i) => (
                                 <img key={`${i}-${positionClass}`} className="card" src={cheats ? images[e] : "../cards/back_light.png"} alt="Error" />
@@ -85,7 +85,7 @@ const Game = () => {
                         </div>
                     </div>
                 </div>
-                <div className={`player-${position}-played`}>
+                <div className={`player-${position}-played played-cards`}>
                     {
                         game?.players[playerIndex]?.played.map((e, i) => (
                             <img key={`${i}-${positionClass}-played`} className="card" src={images[e]} alt="Error" />
@@ -146,6 +146,8 @@ const Game = () => {
         <div className="deck">
             <img className={`card ${images[game?.deck[game?.deck?.length - 1]] ? '' : 'clipped'}`} src={images[game?.deck[game?.deck?.length - 1]] || `../cards/${game?.trump?.split('_')[0]}_A.png`} alt="Error" />
             <p style={{ opacity: game?.deck.length !== 0 ? '1' : '0' }}>{game?.deck.length}</p>
+
+            <span className="alt-taken">{game?.players[myIndex]?.taken?.flat(Infinity).length}</span>
         </div>
 
         {
